@@ -1,13 +1,28 @@
 (function ($) {
     'use strict';
+	
+	$.fn.draggableSvg = function (options) {
+        return this.each(function () {
+            var $object = $(this);
 
-    var _getNewAxis = function (clientAxis, elementAxis, currentAxis) {
-        var diff = 0;
-        var newA = 0;
+            $object.css("cursor", "move");
 
-        diff = clientAxis - currentAxis;
-        newA = elementAxis + diff;
-        return newA.toString();
+            $.draggableSvg($object, options);
+        });
+    };
+	
+	$.draggableSvg = function ($object, options) {
+        var defaults = {
+            x: true,
+            y: true,
+            invertAxis: false
+        }
+
+        var settings = $.extend({}, defaults, options)
+
+        if (!settings.x && !settings.y) settings = $.extend({}, defaults)
+
+        _addEvents($object, settings);
     }
 
     var _addEvents = function ($object, settings) {
@@ -23,7 +38,7 @@
         var currentY = 0;
 
         function mouseDown(event) {
-            selectedElement = event.target;
+            selectedElement = event.currentTarget;
 
             if (isEnabledX) {
                 currentX = event.clientX;
@@ -49,14 +64,17 @@
                 event.clientX = event.clientY;
                 event.clientY = temp;
             }
-
-            if (isEnabledX) {
-                $(selectedElement).attr("x", _getNewAxis(event.clientX, parseInt($(selectedElement).attr("x")), currentX));
+            if (isEnabledX) {				
+                $(selectedElement).attr("x",
+				_getNewAxis(event.clientX, parseInt($(selectedElement).attr("x")), currentX));
+				
                 currentX = event.clientX;      
             }
 
             if (isEnabledY) {
-                $(selectedElement).attr("y", _getNewAxis(event.clientY, parseInt($(selectedElement).attr("y")), currentY));
+                $(selectedElement).attr("y",
+				_getNewAxis(event.clientY, parseInt($(selectedElement).attr("y")), currentY));
+				
                 currentY = event.clientY;
             }
         }
@@ -66,29 +84,14 @@
             $(this).off("mousemove");
         }
     }
+	
+	    var _getNewAxis = function (clientAxis, elementAxis, currentAxis) {
+			var diff = 0;
+			var newA = 0;
 
-    $.draggableSvg = function ($object, options) {
-        var defaults = {
-            x: true,
-            y: true,
-            invertAxis: false
-        }
-
-        var settings = $.extend({}, defaults, options)
-
-        if (!settings.x && !settings.y) settings = $.extend({}, defaults)
-
-        _addEvents($object, settings);
+			diff = clientAxis - currentAxis;
+			newA = elementAxis + diff;
+			return newA.toString();
     }
-
-    $.fn.draggableSvg = function (options) {
-        return this.each(function () {
-            var $object = $(this);
-
-            $object.css("cursor", "move");
-
-            $.draggableSvg($object, options);
-        });
-    };
-
+	
 })(jQuery);
